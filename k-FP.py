@@ -35,11 +35,11 @@ dic_of_feature_data = rootdir + r"Features"
 ### Parameters ###
 # Number of sites, number of instances per site, number of (alexa/hs) monitored training instances per site, Number of trees for RF etc.
 
-alexa_sites = 55
-alexa_instances = 100
-alexa_train_inst = 60
+alexa_sites = 99
+alexa_instances = 30
+alexa_train_inst = 20
 
-hs_sites = 30
+hs_sites = 0
 hs_instances = 100
 hs_train_inst = 60
 
@@ -50,8 +50,8 @@ mon_test_inst = alexa_instances - mon_train_inst
 
 num_Trees = 1000
 
-unmon_total = 100000
-unmon_train = 5000
+unmon_total = 0
+unmon_train = 0
 
 
 ############ Feeder functions ############
@@ -81,9 +81,11 @@ def dictionary_(path_to_dict = dic_of_feature_data, path_to_alexa = alexa_monito
                  'unmonitored_label': []}
 
     print "Creating Alexa features..."
+    print "Alexa path is", path_to_alexa
     for i in range(alexa_sites):
         for j in range(alexa_instances):
-            fname = str(i) + "_" + str(j)
+            print "processing"+str(i)+"......"+str(j)
+            fname = str(i) + "-" + str(j)
             if os.path.exists(path_to_alexa + fname):
                 tcp_dump = open(path_to_alexa + fname).readlines()
                 g = []
@@ -123,6 +125,7 @@ def dictionary_(path_to_dict = dic_of_feature_data, path_to_alexa = alexa_monito
     assert len(data_dict['alexa_feature']) == len(data_dict['alexa_label'])
     assert len(data_dict['hs_feature']) == len(data_dict['hs_label'])
     assert len(data_dict['unmonitored_feature']) == len(data_dict['unmonitored_label'])
+    print data_dict["alexa_feature"]
     fileObject = open(dic_of_feature_data,'wb')
     dill.dump(data_dict,fileObject)
     fileObject.close()
@@ -367,6 +370,8 @@ if __name__ == "__main__":
     parser.add_argument('--distance_stats', action='store_true', help='Open world classification.')
     parser.add_argument('--knn', nargs=1, metavar="INT", help='Number of nearest neighbours.')
     parser.add_argument('--mon_type', nargs=1, metavar="STR", help='The type of monitored dataset - alexa or hs.')
+    parser.add_argument('--alexa_dir',  type=str, default=alexa_monitored_data, 
+            help='Location of alexa files')
 
     args = parser.parse_args()
 
@@ -375,7 +380,7 @@ if __name__ == "__main__":
         # Example command line:
         # $ python k-FP.py --dictionary
 
-        dictionary_()
+        dictionary_(path_to_alexa=args.alexa_dir)
 
     elif args.RF_closedworld:
 
